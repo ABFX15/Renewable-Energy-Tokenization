@@ -1,66 +1,43 @@
-## Foundry
+# Renewable Energy Project NFT Platform 🌱⚡
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A decentralized platform enabling renewable energy project funding through NFT fractionalization.
 
-Foundry consists of:
+## Overview
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+This platform allows renewable energy project owners to tokenize their projects as NFTs and enables investors to purchase fractions of these projects. By bridging the gap between renewable energy initiatives and decentralized finance, we're making green energy investment more accessible and efficient.
 
-## Documentation
+## Key Features
 
-https://book.getfoundry.sh/
+- **Project NFT Creation**: Project owners can create NFTs representing their renewable energy projects
+- **Project Management**: Owners can update project status and manage project details
+- **Transparent Tracking**: All project information is stored on-chain for maximum transparency
+- **Fractional Investment** (Coming Soon): Investors will be able to purchase fractions of project NFTs
+- **Return Distribution** (Coming Soon): Automated distribution of project returns to fractional owners
 
-## Usage
+## Smart Contracts
 
-### Build
+### DeployProjectIdeas.sol
+- Main contract for project NFT creation and management
+- Handles project lifecycle and ownership
+- Implements ERC721 with Enumerable and URIStorage extensions
 
-```shell
-$ forge build
-```
+### EnergyNFT.sol
+- Base NFT implementation for energy projects
+- Handles token minting and URI management
 
-### Test
+### Investment Contract (Coming Soon)
+- Will handle fractional ownership of project NFTs
+- Will manage investment limits and return distribution
+- Will implement automated dividend distribution to investors
 
-```shell
-$ forge test
-```
+## Technical Details
 
-### Format
+- Built with Solidity ^0.8.22
+- Uses OpenZeppelin contracts for secure implementation
+- Implements ERC721 standard with additional extensions
+- Comprehensive testing suite using Forge
 
-```shell
-$ forge fmt
-```
+## Getting Started
 
-### Gas Snapshots
+1. Clone the repository
 
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```

@@ -1,0 +1,8 @@
+1. Tokenization of renewable energy projects
+2. Users can propose a new renewable energy project
+3. Investors can invest in the project by buying NFTs
+4. The NFTs represent shares in the project
+5. The project will be funded by the investors
+6. Investors will receive a portion of the energy produced by the project
+
+Register the User
