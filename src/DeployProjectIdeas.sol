@@ -16,12 +16,11 @@ import {EnergyNFT} from "./EnergyNFT.sol";
  *         allowing investors to purchase shares and earn returns from the project.
  *         Project owners can create and manage their projects, while investors can
  *         buy fractions of project NFTs to participate in the returns.
- * 
+ *
  * @dev The contract uses ERC721 with Enumerable and URIStorage extensions to manage
  *      project NFTs. Each NFT represents a complete project, which can then be
  *      fractionalized for investment purposes.
  */
-
 contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     error DeployProjectIdeas__NotProjectOwner();
     error DeployProjectIdeas__ProjectDoesNotExist();
@@ -57,9 +56,15 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         COMPLETED
     }
 
-    event ProjectCreated(uint256 indexed projectId, address indexed projectOwner, string projectName, string projectURI, uint256 projectReturns);
+    event ProjectCreated(
+        uint256 indexed projectId,
+        address indexed projectOwner,
+        string projectName,
+        string projectURI,
+        uint256 projectReturns
+    );
 
-    constructor(address _projectOwner) 
+    constructor(address _projectOwner)
         ERC721("ProjectIdeas", "PID")
         ERC721Enumerable()
         ERC721URIStorage()
@@ -78,11 +83,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         _;
     }
 
-    modifier validateProjectCreation(
-        string memory _projectName,
-        string memory _projectURI,
-        uint256 _projectReturns
-    ) {
+    modifier validateProjectCreation(string memory _projectName, string memory _projectURI, uint256 _projectReturns) {
         if (bytes(_projectName).length == 0) {
             revert DeployProjectIdeas__InvalidProjectName();
         }
@@ -101,7 +102,10 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
      * @param _projectURI The URI of the project.
      * @param projectReturns The returns of the project.
      */
-    function createProject(string memory _projectName, string memory _projectURI, uint256 projectReturns) external validateProjectCreation(_projectName, _projectURI, projectReturns) {
+    function createProject(string memory _projectName, string memory _projectURI, uint256 projectReturns)
+        external
+        validateProjectCreation(_projectName, _projectURI, projectReturns)
+    {
         s_projectId++;
         uint256 newProjectId = s_projectId;
 
@@ -137,11 +141,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
      * @param _projectId The ID of the project to retrieve.
      * @return A Project struct containing the project's details.
      */
-    function getProject(uint256 _projectId) 
-        external 
-        view 
-        returns (Project memory) 
-    {
+    function getProject(uint256 _projectId) external view returns (Project memory) {
         return projects[_projectId];
     }
 
@@ -181,19 +181,11 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         return super._update(to, tokenId, auth);
     }
 
-    function _increaseBalance(address account, uint128 value)
-        internal
-        override(ERC721, ERC721Enumerable)
-    {
+    function _increaseBalance(address account, uint128 value) internal override(ERC721, ERC721Enumerable) {
         super._increaseBalance(account, value);
     }
 
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
-        returns (string memory)
-    {
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
         return super.tokenURI(tokenId);
     }
 

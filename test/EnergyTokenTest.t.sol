@@ -26,8 +26,8 @@ contract EnergyTokenTest is Test {
         vm.prank(user);
         energyToken.mintTokens{value: INITIAL_DEPOSIT_PRICE}();
         assertEq(energyToken.balanceOf(user), 1);
-        console.log('total supply: %s', energyToken.totalSupply());
-        console.log('Tokens minted: %s', energyToken.balanceOf(user));
+        console.log("total supply: %s", energyToken.totalSupply());
+        console.log("Tokens minted: %s", energyToken.balanceOf(user));
     }
 
     function testEmitsTokensMinted() public {
@@ -44,5 +44,4 @@ contract EnergyTokenTest is Test {
         energyToken.mintTokens{value: INSUFFICIENT_FUNDS}();
         assertEq(energyToken.balanceOf(user2), 0);
     }
-
 }
