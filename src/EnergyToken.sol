@@ -3,7 +3,7 @@
 pragma solidity ^0.8.22;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 /**
  * @title EnergyToken - Fractional Investment Token for Renewable Energy Projects
  * @author Adam Cryptab
@@ -12,19 +12,21 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  *         and expected returns determined at deployment. Investors can mint tokens by sending ETH, and will be
  *         eligible for returns based on their token holdings once the project generates revenue.
  */
-contract EnergyToken is ERC20 {
+contract EnergyToken is ERC20, Ownable {
     error EnergyToken__InsufficientFunds();
     error EnergyToken__ZeroTokens();
     error EnergyToken__ExceedsMaxSupply();
+    error EnergyToken__WithdrawalFailed();
 
-    event TokensMinted(address indexed buyer, uint256 amount, uint256 cost);
 
     address public projectOwner;
     uint256 public expectedReturn;
     uint256 public totalInvestment;
     uint256 public currentTokenPrice;
 
-    constructor(address _projectOwner, uint256 _expectedReturn, uint256 _initialPrice) ERC20("EnergyToken", "ET") {
+    event TokensMinted(address indexed buyer, uint256 amount, uint256 cost);
+
+    constructor(address _projectOwner, uint256 _expectedReturn, uint256 _initialPrice) ERC20("EnergyToken", "ET") Ownable(_projectOwner) {
         projectOwner = _projectOwner;
         expectedReturn = _expectedReturn;
         currentTokenPrice = _initialPrice;
@@ -46,4 +48,12 @@ contract EnergyToken is ERC20 {
 
         emit TokensMinted(msg.sender, tokensToMint, msg.value);
     }
+
+    function withdraw() external onlyOwner {
+        uint256 amount = address(this).balance;
+        (bool success, ) = payable(projectOwner).call{value: amount}("");
+        if (!success) revert EnergyToken__WithdrawalFailed();
+    }
+
+    receive() external payable {}
 }

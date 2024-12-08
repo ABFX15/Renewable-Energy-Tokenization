@@ -30,7 +30,6 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
 
     uint256 public s_projectId;
     uint256 public s_totalProjects;
-    address public s_projectOwner;
     address[] public s_projectOwners;
     bool public s_isProjectActive;
 
