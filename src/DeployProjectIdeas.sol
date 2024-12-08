@@ -32,6 +32,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
     uint256 public s_totalProjects;
     address[] public s_projectOwners;
     bool public s_isProjectActive;
+    EnergyNFT public energyNFT;
 
     uint256 public constant MIN_INVESTMENT = 1e18;
     uint256 public constant MAX_INVESTMENT = 100e18;
@@ -63,7 +64,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         uint256 projectReturns
     );
 
-    constructor(address _projectOwner)
+    constructor(address _projectOwner, address _energyNFT)
         ERC721("ProjectIdeas", "PID")
         ERC721Enumerable()
         ERC721URIStorage()
@@ -73,6 +74,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         s_totalProjects = 0;
         s_isProjectActive = true;
         s_projectOwners.push(_projectOwner);
+        energyNFT = EnergyNFT(_energyNFT);
     }
 
     modifier onlyProjectOwner(uint256 _projectId) {
@@ -83,15 +85,9 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
     }
 
     modifier validateProjectCreation(string memory _projectName, string memory _projectURI, uint256 _projectReturns) {
-        if (bytes(_projectName).length == 0) {
-            revert DeployProjectIdeas__InvalidProjectName();
-        }
-        if (bytes(_projectURI).length == 0) {
-            revert DeployProjectIdeas__InvalidProjectURI();
-        }
-        if (_projectReturns == 0) {
-            revert DeployProjectIdeas__InvalidProjectReturns();
-        }
+        if (bytes(_projectName).length == 0) revert DeployProjectIdeas__InvalidProjectName();
+        if (bytes(_projectURI).length == 0) revert DeployProjectIdeas__InvalidProjectURI();
+        if (_projectReturns == 0) revert DeployProjectIdeas__InvalidProjectReturns();
         _;
     }
 
@@ -121,7 +117,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         projects[newProjectId] = newProject;
         s_totalProjects++;
         s_projectOwners.push(msg.sender);
-        _safeMint(msg.sender, newProjectId);
+        energyNFT.mintNFT(msg.sender);
 
         emit ProjectCreated(newProjectId, msg.sender, _projectName, _projectURI, projectReturns);
     }

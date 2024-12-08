@@ -12,12 +12,12 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
  *         and expected returns determined at deployment. Investors can mint tokens by sending ETH, and will be
  *         eligible for returns based on their token holdings once the project generates revenue.
  */
+
 contract EnergyToken is ERC20, Ownable {
     error EnergyToken__InsufficientFunds();
     error EnergyToken__ZeroTokens();
     error EnergyToken__ExceedsMaxSupply();
     error EnergyToken__WithdrawalFailed();
-
 
     address public projectOwner;
     uint256 public expectedReturn;
@@ -26,7 +26,10 @@ contract EnergyToken is ERC20, Ownable {
 
     event TokensMinted(address indexed buyer, uint256 amount, uint256 cost);
 
-    constructor(address _projectOwner, uint256 _expectedReturn, uint256 _initialPrice) ERC20("EnergyToken", "ET") Ownable(_projectOwner) {
+    constructor(address _projectOwner, uint256 _expectedReturn, uint256 _initialPrice)
+        ERC20("EnergyToken", "ET")
+        Ownable(_projectOwner)
+    {
         projectOwner = _projectOwner;
         expectedReturn = _expectedReturn;
         currentTokenPrice = _initialPrice;
@@ -51,7 +54,7 @@ contract EnergyToken is ERC20, Ownable {
 
     function withdraw() external onlyOwner {
         uint256 amount = address(this).balance;
-        (bool success, ) = payable(projectOwner).call{value: amount}("");
+        (bool success,) = payable(projectOwner).call{value: amount}("");
         if (!success) revert EnergyToken__WithdrawalFailed();
     }
 
