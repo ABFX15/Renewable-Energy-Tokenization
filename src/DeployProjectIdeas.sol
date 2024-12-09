@@ -31,6 +31,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
     uint256 public s_projectId;
     uint256 public s_totalProjects;
     address[] public s_projectOwners;
+    Project[] public s_projects;
     bool public s_isProjectActive;
     EnergyNFT public energyNFT;
 
@@ -45,6 +46,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         uint256 minInvestment;
         uint256 maxInvestment;
         uint256 projectReturns;
+        uint256 fundingGoal;
         ProjectStatus projectStatus;
     }
 
@@ -112,9 +114,11 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
             minInvestment: MIN_INVESTMENT,
             maxInvestment: MAX_INVESTMENT,
             projectReturns: projectReturns,
+            fundingGoal: 0,
             projectStatus: ProjectStatus.ACTIVE
         });
         projects[newProjectId] = newProject;
+        s_projects.push(newProject);
         s_totalProjects++;
         s_projectOwners.push(msg.sender);
         energyNFT.mintNFT(msg.sender);
@@ -137,7 +141,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
      * @return A Project struct containing the project's details.
      */
     function getProject(uint256 _projectId) external view returns (Project memory) {
-        return projects[_projectId];
+        return s_projects[_projectId];
     }
 
     /**
