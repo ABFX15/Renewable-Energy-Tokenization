@@ -16,5 +16,9 @@ contract EnergyNFTTest is Test {
         vm.deal(user, 10 ether);
     }
 
-    function testMintNFT() public {}
+    function testMintNFT() public {
+        vm.prank(address(this));
+        energyNFT.mintNFT(user);
+        assertEq(energyNFT.balanceOf(user), 1);
+    }
 }
