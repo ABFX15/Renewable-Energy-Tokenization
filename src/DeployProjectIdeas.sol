@@ -29,30 +29,31 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
     error DeployProjectIdeas__InvalidProjectReturns();
     error DeployProjectIdeas__MintFailed();
 
+    uint256 public constant MIN_INVESTMENT = 0.01 ether;
+    uint256 public constant MAX_INVESTMENT = 100 ether;
+
     uint256 public s_projectId;
     uint256 public s_totalProjects;
     address[] public s_projectOwners;
-    Project[] public s_projects;
     bool public s_isProjectActive;
     EnergyNFT public energyNFT;
-
-    uint256 public constant MIN_INVESTMENT = 1e18;
-    uint256 public constant MAX_INVESTMENT = 100e18;
+    address public energyNFTAddress;
 
     struct Project {
         address projectOwner;
         string projectName;
         string projectURI;
         uint256 projectId;
-        uint256 minInvestment;
-        uint256 maxInvestment;
         uint256 projectReturns;
         uint256 fundingGoal;
         uint256 totalStaked;
         uint256 stakingStartTime;
         uint256 stakingEndTime;
         uint256 rewardRate;
+        uint256 tokenId;
         ProjectStatus projectStatus;
+        uint256 minInvestment;
+        uint256 maxInvestment;
     }
 
     mapping(uint256 => Project) public projects;
@@ -82,6 +83,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         s_totalProjects = 0;
         s_isProjectActive = true;
         s_projectOwners.push(_projectOwner);
+        energyNFTAddress = _energyNFT;
         energyNFT = EnergyNFT(_energyNFT);
     }
 
@@ -99,49 +101,47 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         _;
     }
 
+    struct ProjectCreationParams {
+        string projectName;
+        string projectURI;
+        uint256 projectReturns;
+        uint256 fundingGoal;
+        uint256 stakingDuration;
+        uint256 rewardRate;
+    }
+
     /**
      * @notice Creates a new renewable energy project as an NFT.
-     * @param _projectName The name of the project.
-     * @param _projectURI The URI of the project.
-     * @param projectReturns The returns of the project.
-     * @param fundingGoal The funding goal of the project.
-     * @param stakingDuration The duration of the staking period.
-     * @param rewardRate The reward rate for the staking period.
+     * @param params The parameters for creating a project.
      */
-    function createProject(
-        string memory _projectName,
-        string memory _projectURI,
-        uint256 projectReturns,
-        uint256 fundingGoal,
-        uint256 stakingDuration,
-        uint256 rewardRate
-    ) external validateProjectCreation(_projectName, _projectURI, projectReturns) {
-        s_projectId++;
-        uint256 newProjectId = s_projectId;
-
-        Project memory newProject = Project({
-            projectOwner: msg.sender,
-            projectName: _projectName,
-            projectURI: _projectURI,
-            projectId: newProjectId,
-            minInvestment: MIN_INVESTMENT,
-            maxInvestment: MAX_INVESTMENT,
-            projectReturns: projectReturns,
-            fundingGoal: fundingGoal,
-            totalStaked: 0,
-            stakingStartTime: block.timestamp,
-            stakingEndTime: block.timestamp + stakingDuration,
-            rewardRate: rewardRate,
-            projectStatus: ProjectStatus.ACTIVE
-        });
-        projects[newProjectId] = newProject;
-        s_projects.push(newProject);
-        s_totalProjects++;
-        s_projectOwners.push(msg.sender);
+    function createProject(ProjectCreationParams memory params)
+        external
+        validateProjectCreation(params.projectName, params.projectURI, params.projectReturns)
+    {
+        uint256 newProjectId = ++s_projectId;
         uint256 tokenId = energyNFT.mintNFT(msg.sender);
         if (tokenId == 0) revert DeployProjectIdeas__MintFailed();
 
-        emit ProjectCreated(newProjectId, msg.sender, _projectName, _projectURI, projectReturns);
+        projects[newProjectId] = Project({
+            projectOwner: msg.sender,
+            projectName: params.projectName,
+            projectURI: params.projectURI,
+            projectId: newProjectId,
+            projectReturns: params.projectReturns,
+            fundingGoal: params.fundingGoal,
+            totalStaked: 0,
+            stakingStartTime: block.timestamp,
+            stakingEndTime: block.timestamp + params.stakingDuration,
+            rewardRate: params.rewardRate,
+            tokenId: tokenId,
+            projectStatus: ProjectStatus.ACTIVE,
+            minInvestment: MIN_INVESTMENT,
+            maxInvestment: MAX_INVESTMENT
+        });
+
+        s_totalProjects++;
+
+        emit ProjectCreated(newProjectId, msg.sender, params.projectName, params.projectURI, params.projectReturns);
     }
 
     /**
@@ -159,7 +159,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
      * @return A Project struct containing the project's details.
      */
     function getProject(uint256 _projectId) external view returns (Project memory) {
-        return s_projects[_projectId];
+        return projects[_projectId];
     }
 
     /**

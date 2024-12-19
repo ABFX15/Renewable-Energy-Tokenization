@@ -27,7 +27,7 @@ contract EnergyNFT is ERC721, ERC721URIStorage, Ownable {
      * @param to The address to mint the NFT to.
      * @return The ID of the newly minted NFT.
      */
-    function mintNFT(address to) public onlyOwner returns (uint256) {
+    function mintNFT(address to) public returns (uint256) {
         uint256 newTokenId = currentTokenId;
         currentTokenId++;
         _safeMint(to, newTokenId);
