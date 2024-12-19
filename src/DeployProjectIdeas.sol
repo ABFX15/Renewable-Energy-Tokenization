@@ -108,16 +108,13 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
      * @param rewardRate The reward rate for the staking period.
      */
     function createProject(
-        string memory _projectName, 
-        string memory _projectURI, 
+        string memory _projectName,
+        string memory _projectURI,
         uint256 projectReturns,
         uint256 fundingGoal,
         uint256 stakingDuration,
         uint256 rewardRate
-    )
-        external
-        validateProjectCreation(_projectName, _projectURI, projectReturns)
-    {
+    ) external validateProjectCreation(_projectName, _projectURI, projectReturns) {
         s_projectId++;
         uint256 newProjectId = s_projectId;
 
@@ -141,7 +138,6 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         s_totalProjects++;
         s_projectOwners.push(msg.sender);
         energyNFT.mintNFT(msg.sender);
-        
 
         emit ProjectCreated(newProjectId, msg.sender, _projectName, _projectURI, projectReturns);
     }

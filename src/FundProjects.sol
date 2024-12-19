@@ -39,15 +39,16 @@ contract FundProjects is Ownable {
 
     /*//////////////////////////////////////////////////////////////
                                FUNCTIONS
-    //////////////////////////////////////////////////////////////*/    
+    //////////////////////////////////////////////////////////////*/
     constructor(address _projectIdeas) Ownable(msg.sender) {
         if (_projectIdeas == address(0)) revert FundProjects__InvalidProjectIdeasAddress();
         projectIdeas = DeployProjectIdeas(_projectIdeas);
     }
 
     modifier projectExists(uint256 _projectId) {
-        if (_projectId == 0 || _projectId > projectIdeas.s_totalProjects()) 
+        if (_projectId == 0 || _projectId > projectIdeas.s_totalProjects()) {
             revert FundProjects__ProjectDoesNotExist();
+        }
         _;
     }
 
@@ -56,8 +57,9 @@ contract FundProjects is Ownable {
     //////////////////////////////////////////////////////////////*/
     function depositProject(uint256 _projectId) external projectExists(_projectId) {
         // check the project exists and is not funded
-        if (projectIdeas.getProject(_projectId).projectStatus != DeployProjectIdeas.ProjectStatus.FUNDED)
+        if (projectIdeas.getProject(_projectId).projectStatus != DeployProjectIdeas.ProjectStatus.FUNDED) {
             revert FundProjects__ProjectDoesNotExist();
+        }
         projectIdeas.safeTransferFrom(msg.sender, address(this), _projectId);
         projectDeposited[_projectId][msg.sender] = true;
     }
@@ -65,9 +67,10 @@ contract FundProjects is Ownable {
      * @notice Stakes in a project by selecting the projectID and the amount of ether to stake in the project.
      * @param _projectId The ID of the project to stake in.
      */
+
     function stakeInProject(uint256 _projectId) external payable projectExists(_projectId) {
         DeployProjectIdeas.Project memory project = projectIdeas.getProject(_projectId);
-        
+
         if (msg.value < project.minInvestment || msg.value > project.maxInvestment) {
             revert FundProjects__InvalidInvestmentAmount();
         }
@@ -105,7 +108,7 @@ contract FundProjects is Ownable {
     }
 
     function claimReward(uint256 _projectId) external {
-        DeployProjectIdeas.Project memory project = projectIdeas.getProject(_projectId);
+        projectIdeas.getProject(_projectId);
         uint256 reward = calculateReward(_projectId, msg.sender);
         if (reward == 0) revert FundProjects__NoRewardToClaim();
         projectStakes[_projectId][msg.sender] = 0;
