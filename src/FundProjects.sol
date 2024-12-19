@@ -17,6 +17,7 @@ contract FundProjects is Ownable {
     error FundProjects__ExceedsFundingGoal();
     error FundProjects__NoRewardToClaim();
     error FundProjects__StakingPeriodEnded();
+    error FundProjects__NoStake();
 
     /*//////////////////////////////////////////////////////////////
                                  STATE VARIABLES
@@ -108,9 +109,10 @@ contract FundProjects is Ownable {
     }
 
     function claimReward(uint256 _projectId) external {
-        projectIdeas.getProject(_projectId);
+        if (projectStakes[_projectId][msg.sender] == 0) revert FundProjects__NoStake();
         uint256 reward = calculateReward(_projectId, msg.sender);
-        if (reward == 0) revert FundProjects__NoRewardToClaim();
+        if (reward <= 0) revert FundProjects__NoRewardToClaim();
+
         projectStakes[_projectId][msg.sender] = 0;
         (bool success,) = payable(msg.sender).call{value: reward}("");
         if (!success) revert FundProjects__FailedToSendEther();

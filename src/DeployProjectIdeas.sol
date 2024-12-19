@@ -27,6 +27,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
     error DeployProjectIdeas__InvalidProjectName();
     error DeployProjectIdeas__InvalidProjectURI();
     error DeployProjectIdeas__InvalidProjectReturns();
+    error DeployProjectIdeas__MintFailed();
 
     uint256 public s_projectId;
     uint256 public s_totalProjects;
@@ -137,7 +138,8 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         s_projects.push(newProject);
         s_totalProjects++;
         s_projectOwners.push(msg.sender);
-        energyNFT.mintNFT(msg.sender);
+        uint256 tokenId = energyNFT.mintNFT(msg.sender);
+        if (tokenId == 0) revert DeployProjectIdeas__MintFailed();
 
         emit ProjectCreated(newProjectId, msg.sender, _projectName, _projectURI, projectReturns);
     }
