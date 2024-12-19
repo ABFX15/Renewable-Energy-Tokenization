@@ -18,6 +18,7 @@ contract EnergyToken is ERC20, Ownable {
     error EnergyToken__ZeroTokens();
     error EnergyToken__ExceedsMaxSupply();
     error EnergyToken__WithdrawalFailed();
+    error EnergyToken__NoBalance();
 
     address public projectOwner;
     uint256 public expectedReturn;
@@ -53,6 +54,7 @@ contract EnergyToken is ERC20, Ownable {
     }
 
     function withdraw() external onlyOwner {
+        if (address(this).balance == 0) revert EnergyToken__NoBalance();
         uint256 amount = address(this).balance;
         (bool success,) = payable(projectOwner).call{value: amount}("");
         if (!success) revert EnergyToken__WithdrawalFailed();

@@ -19,6 +19,7 @@ contract EnergyNFT is ERC721, ERC721URIStorage, Ownable {
 
     constructor(string memory _baseURI) ERC721("EnergyNFT", "ENFT") Ownable(msg.sender) {
         baseURI = _baseURI;
+        currentTokenId = 1;
     }
 
     /**
