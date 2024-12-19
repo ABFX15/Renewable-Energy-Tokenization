@@ -47,6 +47,10 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         uint256 maxInvestment;
         uint256 projectReturns;
         uint256 fundingGoal;
+        uint256 totalStaked;
+        uint256 stakingStartTime;
+        uint256 stakingEndTime;
+        uint256 rewardRate;
         ProjectStatus projectStatus;
     }
 
@@ -54,6 +58,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
 
     enum ProjectStatus {
         ACTIVE,
+        STAKING,
         FUNDED,
         COMPLETED
     }
@@ -98,8 +103,18 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
      * @param _projectName The name of the project.
      * @param _projectURI The URI of the project.
      * @param projectReturns The returns of the project.
+     * @param fundingGoal The funding goal of the project.
+     * @param stakingDuration The duration of the staking period.
+     * @param rewardRate The reward rate for the staking period.
      */
-    function createProject(string memory _projectName, string memory _projectURI, uint256 projectReturns)
+    function createProject(
+        string memory _projectName, 
+        string memory _projectURI, 
+        uint256 projectReturns,
+        uint256 fundingGoal,
+        uint256 stakingDuration,
+        uint256 rewardRate
+    )
         external
         validateProjectCreation(_projectName, _projectURI, projectReturns)
     {
@@ -114,7 +129,11 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
             minInvestment: MIN_INVESTMENT,
             maxInvestment: MAX_INVESTMENT,
             projectReturns: projectReturns,
-            fundingGoal: 0,
+            fundingGoal: fundingGoal,
+            totalStaked: 0,
+            stakingStartTime: block.timestamp,
+            stakingEndTime: block.timestamp + stakingDuration,
+            rewardRate: rewardRate,
             projectStatus: ProjectStatus.ACTIVE
         });
         projects[newProjectId] = newProject;
@@ -122,6 +141,7 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
         s_totalProjects++;
         s_projectOwners.push(msg.sender);
         energyNFT.mintNFT(msg.sender);
+        
 
         emit ProjectCreated(newProjectId, msg.sender, _projectName, _projectURI, projectReturns);
     }
@@ -150,16 +170,11 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
      * @return An array of Project structs containing the projects' details.
      */
     function getProjectsByOwner(address _projectOwner) external view returns (Project[] memory) {
-        uint256 ownerProjectCount = 0;
-        for (uint256 i = 1; i <= s_totalProjects; i++) {
-            if (projects[i].projectOwner == _projectOwner) {
-                ownerProjectCount++;
-            }
-        }
-
-        Project[] memory projectsByOwner = new Project[](ownerProjectCount);
+        // Create a dynamic array with maximum possible size
+        Project[] memory projectsByOwner = new Project[](s_totalProjects);
         uint256 currentIndex = 0;
 
+        // Single loop through all projects
         for (uint256 i = 1; i <= s_totalProjects; i++) {
             if (projects[i].projectOwner == _projectOwner) {
                 projectsByOwner[currentIndex] = projects[i];
@@ -167,7 +182,13 @@ contract DeployProjectIdeas is ERC721, ERC721Enumerable, ERC721URIStorage, Ownab
             }
         }
 
-        return projectsByOwner;
+        // Create final array with exact size
+        Project[] memory result = new Project[](currentIndex);
+        for (uint256 i = 0; i < currentIndex; i++) {
+            result[i] = projectsByOwner[i];
+        }
+
+        return result;
     }
 
     // The following functions are overrides required by Solidity.
